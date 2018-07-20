@@ -80,6 +80,7 @@ enum UAVCAN_EXPORT TraceCode
     TraceDiscoveryNodeRemoved,          // node ID
     Trace22,
     // 50
+    TracePruneNode,                     // node ID
 
     NumTraceCodes
 };
@@ -149,7 +150,8 @@ public:
             "DiscoveryGetNodeInfoRequest",
             "DiscoveryNodeRestartDetected",
             "DiscoveryNodeRemoved",
-            ""
+            "",
+            "PruneNode"
         };
         uavcan::StaticAssert<sizeof(Strings) / sizeof(Strings[0]) == NumTraceCodes>::check();
         UAVCAN_ASSERT(code < NumTraceCodes);

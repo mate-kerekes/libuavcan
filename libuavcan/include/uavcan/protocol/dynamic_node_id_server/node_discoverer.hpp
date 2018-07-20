@@ -330,6 +330,11 @@ public:
         return 0;
     }
 
+    void clearNode(NodeID node_id)
+    {
+        committed_node_mask_[node_id.get()] = false;
+    }
+
     /**
      * Returns true if there's at least one node with pending GetNodeInfo.
      */

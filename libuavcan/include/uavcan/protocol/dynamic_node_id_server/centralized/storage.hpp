@@ -127,6 +127,36 @@ public:
         return 0;
     }
 
+    int remove(const NodeID node_id)
+    {
+        if (!node_id.isUnicast())
+        {
+            return -ErrInvalidParam;
+        }
+
+        StorageMarshaller io(storage_);
+
+        // Updating the mask in the storage
+        OccupationMask new_occupation_mask = occupation_mask_;
+        new_occupation_mask[node_id.get()] = false;
+        OccupationMaskArray occupation_array = maskToArray(new_occupation_mask);
+
+        int res = io.setAndGetBack(getOccupationMaskKey(), occupation_array);
+        if (res < 0)
+        {
+            return res;
+        }
+        if (occupation_array != maskToArray(new_occupation_mask))
+        {
+            return -ErrFailure;
+        }
+
+        // Updating the cached mask only if the storage was updated successfully
+        occupation_mask_ = new_occupation_mask;
+
+        return 0;
+    }
+
     /**
      * Returns an invalid node ID if there's no such allocation.
      */

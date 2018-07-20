@@ -191,15 +191,12 @@ public:
             if (monitor_.isNodeKnown(nid))
             {
                 NodeInfoRetriever::Entry& entry = monitor_.getEntry(nid);
-                if (!entry.last_seen.isZero())
+                if (!entry.last_seen.isZero() && _timestamp - entry.last_seen >= MAX_TIME_SINCE_LAST_UPDATE)
                 {
-                    if (_timestamp - entry.last_seen >= MAX_TIME_SINCE_LAST_UPDATE)
-                    {
-                        tracer_.onEvent(TracePruneNode, nid.get());
-                        node_discoverer_.clearNode(nid);
-                        storage_.remove(nid);
-                        entry = NodeInfoRetriever::Entry();
-                    }
+                    tracer_.onEvent(TracePruneNode, nid.get());
+                    node_discoverer_.clearNode(nid);
+                    storage_.remove(nid);
+                    entry = NodeInfoRetriever::Entry();
                 }
             }
         }

@@ -127,7 +127,7 @@ public:
         return 0;
     }
 
-    int remove(const NodeID node_id)
+    int removeNodeID(const NodeID node_id)
     {
         if (!node_id.isUnicast())
         {

@@ -195,7 +195,7 @@ public:
                 {
                     tracer_.onEvent(TracePruneNode, nid.get());
                     node_discoverer_.clearNode(nid);
-                    storage_.remove(nid);
+                    storage_.removeNodeID(nid);
                     entry = NodeInfoRetriever::Entry();
                 }
             }

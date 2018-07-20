@@ -95,29 +95,44 @@ public:
     enum { MaxNumRequestAttempts = 254 };
     enum { UnlimitedRequestAttempts = 0 };
 
-private:
-    typedef MethodBinder<NodeInfoRetriever*,
-                         void (NodeInfoRetriever::*)(const ServiceCallResult<protocol::GetNodeInfo>&)>
-            GetNodeInfoResponseCallback;
-
     struct Entry
     {
+        MonotonicTime last_seen;
         uint32_t uptime_sec;
         uint8_t num_attempts_made;
         bool request_needed;                    ///< Always false for unknown nodes
         bool updated_since_last_attempt;        ///< Always false for unknown nodes
 
         Entry()
-            : uptime_sec(0)
-            , num_attempts_made(0)
-            , request_needed(false)
-            , updated_since_last_attempt(false)
+                : last_seen(MonotonicTime::fromUSec(0))
+                , uptime_sec(0)
+                , num_attempts_made(0)
+                , request_needed(false)
+                , updated_since_last_attempt(false)
         {
 #if UAVCAN_DEBUG
             StaticAssert<sizeof(Entry) <= 8>::check();
 #endif
         }
     };
+
+    /*
+     * Methods
+     */
+    const Entry& getEntry(NodeID node_id) const { return const_cast<NodeInfoRetriever*>(this)->getEntry(node_id); }
+    Entry&       getEntry(NodeID node_id)
+    {
+        if (node_id.get() < 1 || node_id.get() > NodeID::Max)
+        {
+            handleFatalError("NodeInfoRetriever NodeID");
+        }
+        return entries_[node_id.get() - 1];
+    }
+
+private:
+    typedef MethodBinder<NodeInfoRetriever*,
+                         void (NodeInfoRetriever::*)(const ServiceCallResult<protocol::GetNodeInfo>&)>
+            GetNodeInfoResponseCallback;
 
     struct NodeInfoRetrievedHandlerCaller
     {
@@ -177,16 +192,6 @@ private:
     /*
      * Methods
      */
-    const Entry& getEntry(NodeID node_id) const { return const_cast<NodeInfoRetriever*>(this)->getEntry(node_id); }
-    Entry&       getEntry(NodeID node_id)
-    {
-        if (node_id.get() < 1 || node_id.get() > NodeID::Max)
-        {
-            handleFatalError("NodeInfoRetriever NodeID");
-        }
-        return entries_[node_id.get() - 1];
-    }
-
     void startTimerIfNotRunning()
     {
         if (!TimerBase::isRunning())
@@ -291,6 +296,7 @@ private:
 
             startTimerIfNotRunning();
         }
+        entry.last_seen = msg.getMonotonicTimestamp();
         entry.uptime_sec = msg.uptime_sec;
         entry.updated_since_last_attempt = true;
 
@@ -308,6 +314,7 @@ private:
              * Updating the uptime here allows to properly handle a corner case where the service response arrives
              * after the device has restarted and published its new NodeStatus (although it's unlikely to happen).
              */
+            entry.last_seen = result.getResponse().getMonotonicTimestamp();
             entry.uptime_sec = result.getResponse().status.uptime_sec;
             entry.request_needed = false;
             listeners_.forEach(NodeInfoRetrievedHandlerCaller(result.getCallID().server_node_id,

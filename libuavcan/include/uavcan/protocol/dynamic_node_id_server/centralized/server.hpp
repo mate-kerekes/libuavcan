@@ -7,6 +7,7 @@
 
 #include <uavcan/build_config.hpp>
 #include <uavcan/debug.hpp>
+#include <uavcan/protocol/node_info_retriever.hpp>
 #include <uavcan/protocol/dynamic_node_id_server/abstract_server.hpp>
 #include <uavcan/protocol/dynamic_node_id_server/node_id_selector.hpp>
 #include <uavcan/protocol/dynamic_node_id_server/storage_marshaller.hpp>
@@ -28,6 +29,7 @@ namespace centralized
 class Server : public AbstractServer
 {
     Storage storage_;
+    NodeInfoRetriever monitor_;
 
     /*
      * Private methods
@@ -122,6 +124,7 @@ public:
            IEventTracer& tracer)
         : AbstractServer(node, tracer)
         , storage_(storage)
+        , monitor_(node)
     { }
 
     int init(const UniqueID& own_unique_id,
@@ -131,6 +134,12 @@ public:
          * Initializing storage first, because the next step requires it to be loaded
          */
         int res = storage_.init();
+        if (res < 0)
+        {
+            return res;
+        }
+
+        res = monitor_.start();
         if (res < 0)
         {
             return res;
@@ -168,6 +177,29 @@ public:
         }
 
         return 0;
+    }
+
+    void pruneOldNodes(const uavcan::MonotonicTime& timestamp)
+    {
+        const MonotonicTime _timestamp = MonotonicTime::fromUSec(timestamp.toUSec());
+        const MonotonicDuration MAX_TIME_SINCE_LAST_UPDATE = MonotonicDuration::fromMSec(10000);
+
+        for (uint8_t i = 1; i <= NodeID::Max; i++)
+        {
+            const NodeID nid(i);
+            UAVCAN_ASSERT(nid.isUnicast());
+            if (monitor_.isNodeKnown(nid))
+            {
+                NodeInfoRetriever::Entry& entry = monitor_.getEntry(nid);
+                if (!entry.last_seen.isZero() && _timestamp - entry.last_seen >= MAX_TIME_SINCE_LAST_UPDATE)
+                {
+                    tracer_.onEvent(TracePruneNode, nid.get());
+                    node_discoverer_.clearNode(nid);
+                    storage_.removeNodeID(nid);
+                    entry = NodeInfoRetriever::Entry();
+                }
+            }
+        }
     }
 
     uint8_t getNumAllocations() const { return storage_.getSize(); }

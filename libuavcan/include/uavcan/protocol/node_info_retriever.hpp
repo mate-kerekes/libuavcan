@@ -111,7 +111,7 @@ public:
                 , updated_since_last_attempt(false)
         {
 #if UAVCAN_DEBUG
-            StaticAssert<sizeof(Entry) <= 8>::check();
+            StaticAssert<sizeof(Entry) <= 16>::check();
 #endif
         }
     };

@@ -717,7 +717,15 @@ public:
             const int res = ::ppoll(pollfds, num_pollfds, &ts, nullptr);
             if (res < 0)
             {
-                return res;
+                // just skip the iteration if we got an EINTR
+                if (errno == EINTR)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return res;
+                }
             }
 
             // Handling poll output

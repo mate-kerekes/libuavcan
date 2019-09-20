@@ -152,7 +152,7 @@ void Dispatcher::handleFrame(const CanRxFrame& can_frame)
     if (!frame.parse(can_frame))
     {
         // This is not counted as a transport error
-        UAVCAN_TRACE("Dispatcher", "Invalid CAN frame received: %s", can_frame.toString().c_str());
+        UAVCAN_ERROR("Dispatcher", "Invalid CAN frame received: %s", can_frame.toString().c_str());
         return;
     }
 
@@ -201,7 +201,7 @@ void Dispatcher::handleLoopbackFrame(const CanRxFrame& can_frame)
     RxFrame frame;
     if (!frame.parse(can_frame))
     {
-        UAVCAN_TRACE("Dispatcher", "Invalid loopback CAN frame: %s", can_frame.toString().c_str());
+        UAVCAN_ERROR("Dispatcher", "Invalid loopback CAN frame: %s", can_frame.toString().c_str());
         UAVCAN_ASSERT(0);  // No way!
         return;
     }
@@ -296,7 +296,7 @@ int Dispatcher::send(const Frame& frame, MonotonicTime tx_deadline, MonotonicTim
     CanFrame can_frame;
     if (!frame.compile(can_frame))
     {
-        UAVCAN_TRACE("Dispatcher", "Unable to send: frame is malformed: %s", frame.toString().c_str());
+        UAVCAN_ERROR("Dispatcher", "Unable to send: frame is malformed: %s", frame.toString().c_str());
         UAVCAN_ASSERT(0);
         return -ErrLogic;
     }

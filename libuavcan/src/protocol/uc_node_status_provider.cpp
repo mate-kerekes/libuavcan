@@ -59,7 +59,7 @@ int NodeStatusProvider::startAndPublish(const TransferPriority priority)
 {
     if (!isNodeInfoInitialized())
     {
-        UAVCAN_TRACE("NodeStatusProvider", "Node info was not initialized");
+        UAVCAN_ERROR("NodeStatusProvider", "Node info was not initialized");
         return -ErrNotInited;
     }
 

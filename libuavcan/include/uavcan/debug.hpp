@@ -8,28 +8,14 @@
 
 #include <uavcan/build_config.hpp>
 
-#if UAVCAN_DEBUG
-
-# include <cstdio>
-# include <cstdarg>
+# if __GNUC__
+__attribute__ ((format(printf, 2, 3)))
+# endif
+void UAVCAN_ERROR(const char* src, const char* fmt, ...);
 
 # if __GNUC__
 __attribute__ ((format(printf, 2, 3)))
 # endif
-static void UAVCAN_TRACE(const char* src, const char* fmt, ...)
-{
-    va_list args;
-    (void)std::printf("UAVCAN: %s: ", src);
-    va_start(args, fmt);
-    (void)std::vprintf(fmt, args);
-    va_end(args);
-    (void)std::puts("");
-}
-
-#else
-
-# define UAVCAN_TRACE(...) ((void)0)
-
-#endif
+void UAVCAN_TRACE(const char* src, const char* fmt, ...);
 
 #endif // UAVCAN_DEBUG_HPP_INCLUDED

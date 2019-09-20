@@ -185,7 +185,7 @@ CanTxQueue::Entry* CanTxQueue::peek()
     {
         if (p->isExpired(timestamp))
         {
-            UAVCAN_TRACE("CanTxQueue", "Peek: Expired %s", p->toString().c_str());
+            UAVCAN_ERROR("CanTxQueue", "Peek: Expired %s", p->toString().c_str());
             Entry* const next = p->getNextListNode();
             registerRejectedFrame();
             remove(p);
@@ -240,7 +240,7 @@ int CanIOManager::sendToIface(uint8_t iface_index, const CanFrame& frame, Monoto
     const int res = iface->send(frame, tx_deadline, flags);
     if (res != 1)
     {
-        UAVCAN_TRACE("CanIOManager", "Send failed: code %i, iface %i, frame %s",
+        UAVCAN_ERROR("CanIOManager", "Send failed: code %i, iface %i, frame %s",
                      res, iface_index, frame.toString().c_str());
     }
     if (res > 0)

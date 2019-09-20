@@ -73,7 +73,7 @@ int MultiFrameIncomingTransfer::read(unsigned offset, uint8_t* data, unsigned le
     const ITransferBuffer* const tbb = const_cast<TransferBufferAccessor&>(buf_acc_).access();
     if (tbb == UAVCAN_NULLPTR)
     {
-        UAVCAN_TRACE("MultiFrameIncomingTransfer", "Read failed: no such buffer");
+        UAVCAN_ERROR("MultiFrameIncomingTransfer", "Read failed: no such buffer");
         return -ErrLogic;
     }
     return tbb->read(offset, data, len);
@@ -113,7 +113,7 @@ bool TransferListener::checkPayloadCrc(const uint16_t compare_with, const ITrans
         const int res = tbb.read(offset, buf, sizeof(buf));
         if (res < 0)
         {
-            UAVCAN_TRACE("TransferListener", "Failed to check CRC: Buffer read failure %i", res);
+            UAVCAN_ERROR("TransferListener", "Failed to check CRC: Buffer read failure %i", res);
             return false;
         }
         if (res == 0)
@@ -125,7 +125,7 @@ bool TransferListener::checkPayloadCrc(const uint16_t compare_with, const ITrans
     }
     if (crc.get() != compare_with)
     {
-        UAVCAN_TRACE("TransferListener", "CRC mismatch, expected=0x%04x, got=0x%04x",
+        UAVCAN_ERROR("TransferListener", "CRC mismatch, expected=0x%04x, got=0x%04x",
                      int(compare_with), int(crc.get()));
         return false;
     }
@@ -155,12 +155,12 @@ void TransferListener::handleReception(TransferReceiver& receiver, const RxFrame
         const ITransferBuffer* tbb = tba.access();
         if (tbb == UAVCAN_NULLPTR)
         {
-            UAVCAN_TRACE("TransferListener", "Buffer access failure, last frame: %s", frame.toString().c_str());
+            UAVCAN_ERROR("TransferListener", "Buffer access failure, last frame: %s", frame.toString().c_str());
             break;
         }
         if (!checkPayloadCrc(receiver.getLastTransferCrc(), *tbb))
         {
-            UAVCAN_TRACE("TransferListener", "CRC error, last frame: %s", frame.toString().c_str());
+            UAVCAN_ERROR("TransferListener", "CRC error, last frame: %s", frame.toString().c_str());
             break;
         }
         MultiFrameIncomingTransfer it(receiver.getLastTransferTimestampMonotonic(),
@@ -217,7 +217,7 @@ void TransferListener::handleFrame(const RxFrame& frame)
             recv = receivers_.insert(key, new_recv);
             if (recv == UAVCAN_NULLPTR)
             {
-                UAVCAN_TRACE("TransferListener", "Receiver registration failed; frame %s", frame.toString().c_str());
+                UAVCAN_ERROR("TransferListener", "Receiver registration failed; frame %s", frame.toString().c_str());
                 return;
             }
         }
@@ -233,7 +233,7 @@ void TransferListener::handleFrame(const RxFrame& frame)
     }
     else
     {
-        UAVCAN_TRACE("TransferListener", "Invalid frame: %s", frame.toString().c_str()); // Invalid frame
+        UAVCAN_ERROR("TransferListener", "Invalid frame: %s", frame.toString().c_str()); // Invalid frame
     }
 }
 

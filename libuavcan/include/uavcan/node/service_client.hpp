@@ -243,7 +243,7 @@ private:
         {
             if (state.hasTimedOut())
             {
-                UAVCAN_TRACE("ServiceClient::TimeoutCallbackCaller", "Timeout from nid=%d, tid=%d, dtname=%s",
+                UAVCAN_ERROR("ServiceClient::TimeoutCallbackCaller", "Timeout from nid=%d, tid=%d, dtname=%s",
                              int(state.getCallID().server_node_id.get()), int(state.getCallID().transfer_id.get()),
                              DataType::getDataTypeFullName());
 
@@ -469,7 +469,7 @@ int ServiceClient<DataType_, Callback_>::addCallState(ServiceCallID call_id)
         const int subscriber_res = SubscriberType::startAsServiceResponseListener();
         if (subscriber_res < 0)
         {
-            UAVCAN_TRACE("ServiceClient", "Failed to start the subscriber, error: %i", subscriber_res);
+            UAVCAN_ERROR("ServiceClient", "Failed to start the subscriber, error: %i", subscriber_res);
             return subscriber_res;
         }
     }
@@ -497,7 +497,7 @@ int ServiceClient<DataType_, Callback_>::call(NodeID server_node_id, const Reque
 {
     if (!coerceOrFallback<bool>(callback_, true))
     {
-        UAVCAN_TRACE("ServiceClient", "Invalid callback");
+        UAVCAN_ERROR("ServiceClient", "Invalid callback");
         return -ErrInvalidConfiguration;
     }
 
@@ -508,7 +508,7 @@ int ServiceClient<DataType_, Callback_>::call(NodeID server_node_id, const Reque
         prepareToCall(SubscriberType::getNode(), DataType::getDataTypeFullName(), server_node_id, out_call_id);
     if (prep_res < 0)
     {
-        UAVCAN_TRACE("ServiceClient", "Failed to prepare the call, error: %i", prep_res);
+        UAVCAN_ERROR("ServiceClient", "Failed to prepare the call, error: %i", prep_res);
         return prep_res;
     }
 
@@ -518,7 +518,7 @@ int ServiceClient<DataType_, Callback_>::call(NodeID server_node_id, const Reque
     const int call_state_res = addCallState(out_call_id);
     if (call_state_res < 0)
     {
-        UAVCAN_TRACE("ServiceClient", "Failed to add call state, error: %i", call_state_res);
+        UAVCAN_ERROR("ServiceClient", "Failed to add call state, error: %i", call_state_res);
         return call_state_res;
     }
 

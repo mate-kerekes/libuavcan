@@ -11,7 +11,7 @@ namespace uavcan
  */
 void ServiceClientBase::CallState::handleDeadline(MonotonicTime)
 {
-    UAVCAN_TRACE("ServiceClient::CallState", "Timeout from nid=%d, tid=%d, dtname=%s",
+    UAVCAN_ERROR("ServiceClient::CallState", "Timeout from nid=%d, tid=%d, dtname=%s",
                  int(id_.server_node_id.get()), int(id_.transfer_id.get()),
                  (owner_.data_type_descriptor_ == UAVCAN_NULLPTR) ? "???" : owner_.data_type_descriptor_->getFullName());
     /*
@@ -38,7 +38,7 @@ int ServiceClientBase::prepareToCall(INode& node,
      */
     if (!server_node_id.isUnicast() || (server_node_id == node.getNodeID()))
     {
-        UAVCAN_TRACE("ServiceClient", "Invalid Server Node ID");
+        UAVCAN_ERROR("ServiceClient", "Invalid Server Node ID");
         return -ErrInvalidParam;
     }
     out_call_id.server_node_id = server_node_id;
@@ -52,7 +52,7 @@ int ServiceClientBase::prepareToCall(INode& node,
         data_type_descriptor_ = GlobalDataTypeRegistry::instance().find(DataTypeKindService, dtname);
         if (data_type_descriptor_ == UAVCAN_NULLPTR)
         {
-            UAVCAN_TRACE("ServiceClient", "Type [%s] is not registered", dtname);
+            UAVCAN_ERROR("ServiceClient", "Type [%s] is not registered", dtname);
             return -ErrUnknownDataType;
         }
         UAVCAN_TRACE("ServiceClient", "Data type descriptor inited: %s", data_type_descriptor_->toString().c_str());
@@ -69,7 +69,7 @@ int ServiceClientBase::prepareToCall(INode& node,
         node.getDispatcher().getOutgoingTransferRegistry().accessOrCreate(otr_key, otr_deadline);
     if (!otr_tid)
     {
-        UAVCAN_TRACE("ServiceClient", "OTR access failure, dtd=%s", data_type_descriptor_->toString().c_str());
+        UAVCAN_ERROR("ServiceClient", "OTR access failure, dtd=%s", data_type_descriptor_->toString().c_str());
         return -ErrMemory;
     }
     out_call_id.transfer_id = *otr_tid;

@@ -38,7 +38,7 @@ protected:
     virtual void registerInternalFailure(const char* msg)
     {
         internal_failure_cnt_++;
-        UAVCAN_TRACE("Node", "Internal failure: %s", msg);
+        UAVCAN_ERROR("Node", "Internal failure: %s", msg);
         (void)msg;
     }
 

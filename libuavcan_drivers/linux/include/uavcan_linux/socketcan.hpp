@@ -635,7 +635,7 @@ class SocketCanDriver : public uavcan::ICanDriver
 
                 down_ = error == ENETDOWN || error == ENODEV;
 
-                UAVCAN_TRACE("SocketCAN", "Iface %d is dead; error %d", this->getFileDescriptor(), error);
+                UAVCAN_ERROR("SocketCAN", "Iface %d is dead; error %d", this->getFileDescriptor(), error);
             }
         }
 

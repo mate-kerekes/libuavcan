@@ -86,7 +86,7 @@ public:
 
         if (!coerceOrFallback<bool>(callback, true))
         {
-            UAVCAN_TRACE("Subscriber", "Invalid callback");
+            UAVCAN_ERROR("Subscriber", "Invalid callback");
             return -ErrInvalidParam;
         }
         callback_ = callback;

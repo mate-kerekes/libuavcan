@@ -1,3 +1,5 @@
+#include <cstdarg>
+#include <cstdio>
 #include <uavcan/debug.hpp>
 
 __attribute__((weak)) void UAVCAN_ERROR(const char* src, const char* fmt, ...)

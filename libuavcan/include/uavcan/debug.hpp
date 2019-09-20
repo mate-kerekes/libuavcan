@@ -8,9 +8,6 @@
 
 #include <uavcan/build_config.hpp>
 
-# include <cstdio>
-# include <cstdarg>
-
 # if __GNUC__
 __attribute__ ((format(printf, 2, 3)))
 # endif

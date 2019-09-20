@@ -61,7 +61,7 @@ int TransferSender::send(const uint8_t* payload, unsigned payload_len, Monotonic
         if (res != int(payload_len))
         {
             UAVCAN_ASSERT(0);
-            UAVCAN_TRACE("TransferSender", "Frame payload write failure, %i", res);
+            UAVCAN_ERROR("TransferSender", "Frame payload write failure, %i", res);
             registerError();
             return (res < 0) ? res : -ErrLogic;
         }
@@ -93,7 +93,7 @@ int TransferSender::send(const uint8_t* payload, unsigned payload_len, Monotonic
             const int write_res = frame.setPayload(buf, BUFLEN);
             if (write_res < 2)
             {
-                UAVCAN_TRACE("TransferSender", "Frame payload write failure, %i", write_res);
+                UAVCAN_ERROR("TransferSender", "Frame payload write failure, %i", write_res);
                 registerError();
                 return write_res;
             }
@@ -125,7 +125,7 @@ int TransferSender::send(const uint8_t* payload, unsigned payload_len, Monotonic
             const int write_res = frame.setPayload(payload + offset, payload_len - unsigned(offset));
             if (write_res < 0)
             {
-                UAVCAN_TRACE("TransferSender", "Frame payload write failure, %i", write_res);
+                UAVCAN_ERROR("TransferSender", "Frame payload write failure, %i", write_res);
                 registerError();
                 return write_res;
             }
@@ -158,7 +158,7 @@ int TransferSender::send(const uint8_t* payload, unsigned payload_len, Monotonic
     TransferID* const tid = dispatcher_.getOutgoingTransferRegistry().accessOrCreate(otr_key, otr_deadline);
     if (tid == UAVCAN_NULLPTR)
     {
-        UAVCAN_TRACE("TransferSender", "OTR access failure, dtid=%d tt=%i",
+        UAVCAN_ERROR("TransferSender", "OTR access failure, dtid=%d tt=%i",
                      int(data_type_id_.get()), int(transfer_type));
         return -ErrMemory;
     }

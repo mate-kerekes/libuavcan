@@ -48,7 +48,7 @@ class UAVCAN_EXPORT DataTypeInfoProvider : Noncopyable
 
             if (!isValidDataTypeKind(DataTypeKind(request.kind.value)))
             {
-                UAVCAN_TRACE("DataTypeInfoProvider", "GetDataTypeInfo request with invalid DataTypeKind %i",
+                UAVCAN_ERROR("DataTypeInfoProvider", "GetDataTypeInfo request with invalid DataTypeKind %i",
                              static_cast<int>(request.kind.value));
                 return;
             }
@@ -64,7 +64,7 @@ class UAVCAN_EXPORT DataTypeInfoProvider : Noncopyable
 
         if (desc == UAVCAN_NULLPTR)
         {
-            UAVCAN_TRACE("DataTypeInfoProvider",
+            UAVCAN_ERROR("DataTypeInfoProvider",
                          "Cannot process GetDataTypeInfo for nonexistent type: dtid=%i dtk=%i name='%s'",
                          static_cast<int>(request.id), static_cast<int>(request.kind.value), request.name.c_str());
             return;

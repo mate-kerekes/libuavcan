@@ -237,7 +237,7 @@ int GenericSubscriber<DataSpec, DataStruct, TransferListenerType>::checkInit()
         GlobalDataTypeRegistry::instance().find(DataTypeKind(DataSpec::DataTypeKind), DataSpec::getDataTypeFullName());
     if (descr == UAVCAN_NULLPTR)
     {
-        UAVCAN_TRACE("GenericSubscriber", "Type [%s] is not registered", DataSpec::getDataTypeFullName());
+        UAVCAN_ERROR("GenericSubscriber", "Type [%s] is not registered", DataSpec::getDataTypeFullName());
         return -ErrUnknownDataType;
     }
 
@@ -267,7 +267,7 @@ void GenericSubscriber<DataSpec, DataStruct, TransferListenerType>::handleIncomi
 
     if (decode_res <= 0)
     {
-        UAVCAN_TRACE("GenericSubscriber", "Unable to decode the message [%i] [%s]",
+        UAVCAN_ERROR("GenericSubscriber", "Unable to decode the message [%i] [%s]",
                      decode_res, DataSpec::getDataTypeFullName());
         failure_count_++;
         node_.getDispatcher().getTransferPerfCounter().addError();
@@ -287,7 +287,7 @@ genericStart(bool (Dispatcher::*registration_method)(TransferListener*))
     const int res = checkInit();
     if (res < 0)
     {
-        UAVCAN_TRACE("GenericSubscriber", "Initialization failure [%s]", DataSpec::getDataTypeFullName());
+        UAVCAN_ERROR("GenericSubscriber", "Initialization failure [%s]", DataSpec::getDataTypeFullName());
         return res;
     }
     return GenericSubscriberBase::genericStart(forwarder_, registration_method);

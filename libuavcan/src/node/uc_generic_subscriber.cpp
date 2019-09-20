@@ -18,7 +18,7 @@ int GenericSubscriberBase::genericStart(TransferListener* listener,
     stop(listener);
     if (!(node_.getDispatcher().*registration_method)(listener))
     {
-        UAVCAN_TRACE("GenericSubscriber", "Failed to register transfer listener");
+        UAVCAN_ERROR("GenericSubscriber", "Failed to register transfer listener");
         return -ErrInvalidTransferListener;
     }
     return 0;

@@ -128,7 +128,7 @@ private:
                                                request.getTransferID());
             if (res < 0)
             {
-                UAVCAN_TRACE("ServiceServer", "Response publication failure: %i", res);
+                UAVCAN_ERROR("ServiceServer", "Response publication failure: %i", res);
                 publisher_.getNode().getDispatcher().getTransferPerfCounter().addError();
                 response_failure_count_++;
             }
@@ -161,7 +161,7 @@ public:
 
         if (!coerceOrFallback<bool>(callback, true))
         {
-            UAVCAN_TRACE("ServiceServer", "Invalid callback");
+            UAVCAN_ERROR("ServiceServer", "Invalid callback");
             return -ErrInvalidParam;
         }
         callback_ = callback;
@@ -169,7 +169,7 @@ public:
         const int publisher_res = publisher_.init();
         if (publisher_res < 0)
         {
-            UAVCAN_TRACE("ServiceServer", "Publisher initialization failure: %i", publisher_res);
+            UAVCAN_ERROR("ServiceServer", "Publisher initialization failure: %i", publisher_res);
             return publisher_res;
         }
         return SubscriberType::startAsServiceRequestListener();

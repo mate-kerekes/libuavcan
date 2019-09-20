@@ -35,7 +35,7 @@ bool Frame::parse(const CanFrame& can_frame)
 {
     if (can_frame.isErrorFrame() || can_frame.isRemoteTransmissionRequest() || !can_frame.isExtended())
     {
-        UAVCAN_TRACE("Frame", "Parsing failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Parsing failed at line %d", __LINE__);
         return false;
     }
 
@@ -47,7 +47,7 @@ bool Frame::parse(const CanFrame& can_frame)
 
     if (can_frame.dlc < 1)
     {
-        UAVCAN_TRACE("Frame", "Parsing failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Parsing failed at line %d", __LINE__);
         return false;
     }
 
@@ -185,7 +185,7 @@ bool Frame::isValid() const
      */
     if (start_of_transfer_ && toggle_)
     {
-        UAVCAN_TRACE("Frame", "Validness check failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Validness check failed at line %d", __LINE__);
         return false;
     }
 
@@ -194,13 +194,13 @@ bool Frame::isValid() const
      */
     if (!src_node_id_.isValid() || !dst_node_id_.isValid())
     {
-        UAVCAN_TRACE("Frame", "Validness check failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Validness check failed at line %d", __LINE__);
         return false;
     }
 
     if (src_node_id_.isUnicast() && (src_node_id_ == dst_node_id_))
     {
-        UAVCAN_TRACE("Frame", "Validness check failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Validness check failed at line %d", __LINE__);
         return false;
     }
 
@@ -209,13 +209,13 @@ bool Frame::isValid() const
      */
     if (transfer_type_ >= NumTransferTypes)
     {
-        UAVCAN_TRACE("Frame", "Validness check failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Validness check failed at line %d", __LINE__);
         return false;
     }
 
     if ((transfer_type_ == TransferTypeMessageBroadcast) != dst_node_id_.isBroadcast())
     {
-        UAVCAN_TRACE("Frame", "Validness check failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Validness check failed at line %d", __LINE__);
         return false;
     }
 
@@ -223,7 +223,7 @@ bool Frame::isValid() const
     if (src_node_id_.isBroadcast() &&
         (!start_of_transfer_ || !end_of_transfer_ || (transfer_type_ != TransferTypeMessageBroadcast)))
     {
-        UAVCAN_TRACE("Frame", "Validness check failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Validness check failed at line %d", __LINE__);
         return false;
     }
 
@@ -232,7 +232,7 @@ bool Frame::isValid() const
      */
     if (payload_len_ > getPayloadCapacity())
     {
-        UAVCAN_TRACE("Frame", "Validness check failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Validness check failed at line %d", __LINE__);
         return false;
     }
 
@@ -241,7 +241,7 @@ bool Frame::isValid() const
      */
     if (!data_type_id_.isValidForDataTypeKind(getDataTypeKindForTransferType(transfer_type_)))
     {
-        UAVCAN_TRACE("Frame", "Validness check failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Validness check failed at line %d", __LINE__);
         return false;
     }
 
@@ -250,7 +250,7 @@ bool Frame::isValid() const
      */
     if (!transfer_priority_.isValid())
     {
-        UAVCAN_TRACE("Frame", "Validness check failed at line %d", __LINE__);
+        UAVCAN_ERROR("Frame", "Validness check failed at line %d", __LINE__);
         return false;
     }
 

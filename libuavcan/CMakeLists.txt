@@ -72,18 +72,38 @@ include_directories(include)
 #
 # libuavcan
 #
+include(GNUInstallDirs)
+
 file(GLOB_RECURSE LIBUAVCAN_CXX_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
 file(GLOB_RECURSE LIBUAVCAN_HXX_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "include/*.hpp")
 add_library(uavcan STATIC ${LIBUAVCAN_CXX_FILES} ${LIBUAVCAN_HXX_FILES} ${DSDLC_OUTPUT_FILES})
 set_property(TARGET uavcan PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_include_directories(uavcan PUBLIC include/dsdlc_generated)
+target_include_directories(uavcan PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/dsdlc_generated>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 add_dependencies(uavcan libuavcan_dsdlc)
 
-install(TARGETS uavcan                            DESTINATION lib)
-install(DIRECTORY include/uavcan                  DESTINATION include)
-install(DIRECTORY include/dsdlc_generated/uavcan  DESTINATION include)  # Generated and lib's .hpp
-install(CODE "execute_process(COMMAND ${PYTHON} setup.py install --record installed_files.log
+install(TARGETS uavcan
+    EXPORT uavcanTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY include/uavcan                  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY include/dsdlc_generated/uavcan  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})  # Generated and lib's .hpp
+install(CODE "execute_process(COMMAND ${PYTHON} setup.py install --root \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/\" --record installed_files.log
                               WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dsdl_compiler)")
+
+install (EXPORT uavcanTargets
+    FILE uavcanTargets.cmake
+    NAMESPACE uavcan::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/uavcan)
+
+configure_file(uavcanConfig.cmake.in uavcanConfig.cmake @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/uavcanConfig.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/uavcan
+    )
+
 
 #
 # Tests and static analysis - only for debug builds

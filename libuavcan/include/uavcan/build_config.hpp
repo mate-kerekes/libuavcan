@@ -242,10 +242,9 @@ typedef char _alignment_check_for_MEM_POOL_BLOCK_SIZE[((MemPoolBlockSize & (MemP
 template <typename T>
 struct UAVCAN_EXPORT IsDynamicallyAllocatable
 {
-    static void check()
+    static constexpr void check()
     {
-        char dummy[(sizeof(T) <= MemPoolBlockSize) ? 1 : -1] = { '0' };
-        (void)dummy;
+        static_assert(sizeof(T) <= MemPoolBlockSize);
     }
 };
 
